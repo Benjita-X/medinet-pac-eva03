@@ -1,0 +1,12 @@
+# Copiar a terraform.tfvars (está en .gitignore) y completar.
+region      = "us-east-1"
+domain_name = "pac.TU-DOMINIO.dpdns.org"
+
+# Cuenta propia: false (crea roles IAM mínimos y OIDC para GitHub).
+# AWS Academy: true (usa LabRole / LabInstanceProfile).
+aws_academy = false
+
+# owner/repo para que GitHub Actions despliegue sin llaves (solo cuenta propia).
+github_repository = "planbkid/MediNet-Core"
+
+cors_origins = ""

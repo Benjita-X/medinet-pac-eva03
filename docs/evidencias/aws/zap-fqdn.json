@@ -1,0 +1,403 @@
+{
+	"@programName": "ZAP",
+	"@version": "2.17.0",
+	"@generated": "Mon, 16 Nov 2026 07:28:31",
+	"created": "2026-11-16T07:28:31.455265530Z",
+	"insights":[
+		{
+			"level": "Low",
+			"reason": "Warning",
+			"site": "",
+			"key": "insight.log.warn",
+			"description": "ZAP warnings logged - see the zap.log file for details",
+			"statistic": "30"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://medinetpacg6.dpdns.org",
+			"key": "insight.code.2xx",
+			"description": "Percentage of responses with status code 2xx",
+			"statistic": "16"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://medinetpacg6.dpdns.org",
+			"key": "insight.code.4xx",
+			"description": "Percentage of responses with status code 4xx",
+			"statistic": "83"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://medinetpacg6.dpdns.org",
+			"key": "insight.endpoint.ctype.application/json",
+			"description": "Percentage of endpoints with content type application/json",
+			"statistic": "100"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://medinetpacg6.dpdns.org",
+			"key": "insight.endpoint.method.GET",
+			"description": "Percentage of endpoints with method GET",
+			"statistic": "40"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://medinetpacg6.dpdns.org",
+			"key": "insight.endpoint.method.PATCH",
+			"description": "Percentage of endpoints with method PATCH",
+			"statistic": "45"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://medinetpacg6.dpdns.org",
+			"key": "insight.endpoint.method.POST",
+			"description": "Percentage of endpoints with method POST",
+			"statistic": "15"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://medinetpacg6.dpdns.org",
+			"key": "insight.endpoint.total",
+			"description": "Count of total endpoints",
+			"statistic": "20"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "https://medinetpacg6.dpdns.org",
+			"key": "insight.response.slow",
+			"description": "Percentage of slow responses",
+			"statistic": "100"
+		}
+	],
+	"site":[ 
+		{
+			"@name": "https://medinetpacg6.dpdns.org",
+			"@host": "medinetpacg6.dpdns.org",
+			"@port": "443",
+			"@ssl": "true",
+			"alerts": [ 
+				{
+					"pluginid": "100000",
+					"alertRef": "100000-1",
+					"alert": "A Client Error response code was returned by the server",
+					"name": "A Client Error response code was returned by the server",
+					"riskcode": "0",
+					"confidence": "3",
+					"riskdesc": "Informational (High)",
+					"desc": "<p>A response code of 404 was returned by the server.</p><p>This may indicate that the application is failing to handle unexpected input correctly.</p><p>Raised by the 'Alert on HTTP Response Code Error' script</p>",
+					"instances":[ 
+						{
+							"id": "9",
+							"uri": "https://medinetpacg6.dpdns.org",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "649",
+							"uri": "https://medinetpacg6.dpdns.org/",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "7",
+							"uri": "https://medinetpacg6.dpdns.org/8916515243537157018",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/8916515243537157018",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "0",
+							"uri": "https://medinetpacg6.dpdns.org/patients?run=&apellido_paterno=&apellido_materno=&prevision=&page=1&page_size=20",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/patients (apellido_materno,apellido_paterno,page,page_size,prevision,run)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "5",
+							"uri": "https://medinetpacg6.dpdns.org/patients/10",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/patients\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "653",
+							"uri": "https://medinetpacg6.dpdns.org/patients/10/",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/patients\/10\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "8",
+							"uri": "https://medinetpacg6.dpdns.org/patients/255405013513399306",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/patients\/255405013513399306",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "731",
+							"uri": "https://medinetpacg6.dpdns.org/patients/actuator/health",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/patients\/actuator\/health",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "478",
+							"uri": "https://medinetpacg6.dpdns.org/computeMetadata/v1/",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/computeMetadata\/v1\/ ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "475",
+							"uri": "https://medinetpacg6.dpdns.org/latest/meta-data/",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/latest\/meta-data\/ ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "494",
+							"uri": "https://medinetpacg6.dpdns.org/metadata/instance",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/metadata\/instance ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "496",
+							"uri": "https://medinetpacg6.dpdns.org/metadata/v1",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/metadata\/v1 ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "482",
+							"uri": "https://medinetpacg6.dpdns.org/opc/v1/instance/",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/opc\/v1\/instance\/ ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "486",
+							"uri": "https://medinetpacg6.dpdns.org/opc/v2/instance/",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/opc\/v2\/instance\/ ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "498",
+							"uri": "https://medinetpacg6.dpdns.org/openstack/latest/meta_data.json",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/openstack\/latest\/meta_data.json ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "6",
+							"uri": "https://medinetpacg6.dpdns.org/patients/10",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/patients\/10 ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "648",
+							"uri": "https://medinetpacg6.dpdns.org/patients/10/",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/patients\/10\/ ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "4",
+							"uri": "https://medinetpacg6.dpdns.org/patients",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/patients ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "651",
+							"uri": "https://medinetpacg6.dpdns.org/patients/",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/patients\/ ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						}
+					],
+					"count": "19",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "388",
+					"wascid": "20",
+					"sourceid": "13"
+				},
+				{
+					"pluginid": "10049",
+					"alertRef": "10049-1",
+					"alert": "Non-Storable Content",
+					"name": "Non-Storable Content",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.</p>",
+					"instances":[ 
+						{
+							"id": "3",
+							"uri": "https://medinetpacg6.dpdns.org/openapi.json",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/openapi.json",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "authorization:",
+							"otherinfo": ""
+						},
+						{
+							"id": "11",
+							"uri": "https://medinetpacg6.dpdns.org/patients/10",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/patients\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "no-store",
+							"otherinfo": ""
+						},
+						{
+							"id": "10",
+							"uri": "https://medinetpacg6.dpdns.org/patients/10",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/patients\/10 ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "PATCH ",
+							"otherinfo": ""
+						},
+						{
+							"id": "13",
+							"uri": "https://medinetpacg6.dpdns.org/patients",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/patients ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "no-store",
+							"otherinfo": ""
+						},
+						{
+							"id": "2",
+							"uri": "https://medinetpacg6.dpdns.org/patients/validate-run",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/patients\/validate-run ()({run})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "no-store",
+							"otherinfo": ""
+						}
+					],
+					"count": "5",
+					"systemic": true,
+					"solution": "<p>The content may be marked as storable by ensuring that the following conditions are satisfied:</p><p>The request method must be understood by the cache and defined as being cacheable (\"GET\", \"HEAD\", and \"POST\" are currently defined as cacheable)</p><p>The response status code must be understood by the cache (one of the 1XX, 2XX, 3XX, 4XX, or 5XX response classes are generally understood)</p><p>The \"no-store\" cache directive must not appear in the request or response header fields</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"private\" response directive must not appear in the response</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"Authorization\" header field must not appear in the request, unless the response explicitly allows it (using one of the \"must-revalidate\", \"public\", or \"s-maxage\" Cache-Control response directives)</p><p>In addition to the conditions above, at least one of the following conditions must also be satisfied by the response:</p><p>It must contain an \"Expires\" header field</p><p>It must contain a \"max-age\" response directive</p><p>For \"shared\" caches such as \"proxy\" caches, it must contain a \"s-maxage\" response directive</p><p>It must contain a \"Cache Control Extension\" that allows it to be cached</p><p>It must have a status code that is defined as cacheable by default (200, 203, 204, 206, 300, 301, 404, 405, 410, 414, 501).</p>",
+					"otherinfo": "",
+					"reference": "<p>https://datatracker.ietf.org/doc/html/rfc7234</p><p>https://datatracker.ietf.org/doc/html/rfc7231</p><p>https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html</p>",
+					"cweid": "524",
+					"wascid": "13",
+					"sourceid": "1"
+				},
+				{
+					"pluginid": "10015",
+					"alertRef": "10015",
+					"alert": "Re-examine Cache-control Directives",
+					"name": "Re-examine Cache-control Directives",
+					"riskcode": "0",
+					"confidence": "1",
+					"riskdesc": "Informational (Low)",
+					"desc": "<p>The cache-control header has not been set properly or is missing, allowing the browser and proxies to cache content. For static assets like css, js, or image files this might be intended, however, the resources should be reviewed to ensure that no sensitive content will be cached.</p>",
+					"instances":[ 
+						{
+							"id": "1",
+							"uri": "https://medinetpacg6.dpdns.org/openapi.json",
+							"nodeName": "https:\/\/medinetpacg6.dpdns.org\/openapi.json",
+							"method": "GET",
+							"param": "cache-control",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": ""
+						}
+					],
+					"count": "1",
+					"systemic": false,
+					"solution": "<p>For secure content, ensure the cache-control HTTP header is set with \"no-cache, no-store, must-revalidate\". If an asset should be cached consider setting the directives \"public, max-age, immutable\".</p>",
+					"otherinfo": "",
+					"reference": "<p>https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#web-content-caching</p><p>https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control</p><p>https://grayduck.mn/2021/09/13/cache-control-recommendations/</p>",
+					"cweid": "525",
+					"wascid": "13",
+					"sourceid": "1"
+				}
+			]
+		}
+	],
+	"sequences":[
+	]
+
+}

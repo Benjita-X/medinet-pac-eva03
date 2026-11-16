@@ -1,0 +1,21 @@
+# Escaneo IaC. Cada omisión está justificada; todo lo demás debe pasar.
+directory: [infra]
+framework: [terraform]
+compact: true
+skip-check:
+  - CKV2_AWS_28   # WAF frente al ALB: fuera del presupuesto del laboratorio; mitigado con cabeceras, validación estricta y DAST
+  - CKV_AWS_150   # deletion_protection del ALB: desactivada para poder destruir el laboratorio (variable deletion_protection)
+  - CKV_AWS_293   # deletion_protection de RDS: misma razón
+  - CKV_AWS_157   # RDS standby Multi-AZ: configurable (db_multi_az); el DB subnet group abarca 2 AZs
+  - CKV_AWS_118   # Enhanced Monitoring: requiere un rol IAM que AWS Academy no permite crear
+  - CKV_AWS_353   # Performance Insights: no aplica a db.t4g.micro de laboratorio
+  - CKV_AWS_260   # Puerto 80 abierto en el ALB: solo responde 301 a HTTPS (exigido por la pauta)
+  - CKV_AWS_103   # Listener 80 sin TLS: solo redirige a 443
+  - CKV_AWS_2     # Mismo caso: HTTP solo para redirección
+  - CKV_AWS_144   # Replicación entre regiones del bucket de logs: innecesaria en laboratorio
+  - CKV_AWS_145   # Los logs del ALB solo admiten SSE-S3 (no KMS)
+  - CKV_AWS_18    # Access logging del bucket de logs (evita recursión)
+  - CKV2_AWS_62   # Notificaciones de eventos del bucket de logs: no requeridas
+  - CKV_AWS_378   # Target group HTTP: TLS termina en el ALB, tráfico interno en subred privada
+  - CKV_AWS_382   # Egreso 443 a 0.0.0.0/0 desde app: necesario para ECR/SSM/Secrets Manager vía NAT
+  - CKV2_AWS_57   # Rotación automática del secreto maestro de RDS: rotación manual documentada

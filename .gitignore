@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# Secretos: nunca a GitHub
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+# Terraform: el estado contiene datos sensibles
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/terraform.tfvars
+infra/.terraform.lock.hcl.bak
+evidence/
+
+# Paquete de entrega (se sube aparte a la plataforma)
+entrega/

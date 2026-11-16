@@ -1,0 +1,11 @@
+*
+!requirements.txt
+!app/
+!migrations/
+!alembic.ini
+!scripts/containers/
+**/__pycache__/
+**/*.pyc
+**/.env*
+**/*.pem
+**/*.key

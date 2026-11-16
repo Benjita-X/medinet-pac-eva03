@@ -1,0 +1,2 @@
+$ docker run ... medinet-pac:local admin   # migraciones + rol de minimo privilegio
+Migraciones y permisos preparados; sin mostrar credenciales.

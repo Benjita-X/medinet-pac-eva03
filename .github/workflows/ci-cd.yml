@@ -1,0 +1,178 @@
+name: CI/CD MediNet-Core PAC (EVA03)
+
+# Cada push: pruebas, SAST, escaneo de dependencias e imagen, y escaneo de la
+# infraestructura como código (Checkov) ANTES de cualquier despliegue.
+# Despliegue rodante a los 2 nodos EC2 solo en main y si DEPLOY_ENABLED=true.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+jobs:
+  test:
+    name: Pruebas (pytest + PostgreSQL)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: pac_test
+          POSTGRES_USER: pac_test_admin
+          POSTGRES_PASSWORD: solo-ci-efimero
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U pac_test_admin -d pac_test"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      TEST_DB_HOST: 127.0.0.1
+      TEST_DB_PORT: "5432"
+      TEST_DB_ADMIN_PASSWORD: solo-ci-efimero
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest -q
+
+  sast:
+    name: SAST (Bandit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - run: pip install bandit
+      - name: Bandit (falla con hallazgos de severidad media o alta)
+        run: |
+          bandit -r app scripts/containers -f json -o bandit-report.json || true
+          bandit -r app scripts/containers -ll
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-report
+          path: bandit-report.json
+
+  iac-scan:
+    name: IaC (terraform validate + Checkov)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: terraform fmt y validate
+        working-directory: infra
+        run: |
+          terraform fmt -check -recursive
+          terraform init -backend=false -input=false
+          terraform validate
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install checkov
+      - name: Checkov (bloquea el pipeline si hay malas prácticas)
+        run: |
+          checkov --config-file .checkov.yaml -o cli -o sarif --output-file-path console,checkov-report.sarif
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: checkov-report
+          path: checkov-report.sarif
+
+  build-scan:
+    name: Build imagen + Trivy
+    runs-on: ubuntu-latest
+    needs: [test, sast, iac-scan]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir imagen
+        run: docker build -t medinet-pac:${{ github.sha }} .
+      # Trivy por su imagen oficial con versión fija (la misma de la EVA02).
+      - name: Trivy - dependencias del repositorio (SCA)
+        run: |
+          docker run --rm -v "$PWD:/work" -w /work aquasec/trivy:0.58.1 \
+            fs --scanners vuln --severity CRITICAL,HIGH --ignore-unfixed --exit-code 1 .
+      - name: Trivy - imagen (falla con CRITICAL corregibles)
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.58.1 \
+            image --scanners vuln --severity CRITICAL --ignore-unfixed --exit-code 1 medinet-pac:${{ github.sha }}
+      - name: Trivy - reporte completo como evidencia
+        if: always()
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD:/work" -w /work aquasec/trivy:0.58.1 \
+            image --scanners vuln --severity CRITICAL,HIGH,MEDIUM --format json -o trivy-image-report.json \
+            --exit-code 0 medinet-pac:${{ github.sha }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-report
+          path: trivy-image-report.json
+      - name: Guardar imagen para el despliegue
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: docker save medinet-pac:${{ github.sha }} | gzip > image.tar.gz
+      - uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        with:
+          name: image
+          path: image.tar.gz
+          retention-days: 1
+
+  deploy:
+    name: Despliegue rodante a 2 nodos EC2 (Multi-AZ)
+    needs: [build-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # OIDC: credenciales temporales, sin llaves guardadas
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: image
+      - name: Credenciales AWS (OIDC en cuenta propia)
+        if: vars.AWS_ROLE_ARN != ''
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Credenciales AWS (sesión temporal de AWS Academy)
+        if: vars.AWS_ROLE_ARN == ''
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Publicar imagen en ECR (tag inmutable = sha)
+        id: push
+        run: |
+          REPO=$(aws ecr describe-repositories --repository-names medinet-pac --query 'repositories[0].repositoryUri' --output text)
+          aws ecr get-login-password | docker login --username AWS --password-stdin "${REPO%%/*}"
+          docker load -i image.tar.gz
+          docker tag medinet-pac:${{ github.sha }} "$REPO:${{ github.sha }}"
+          docker push "$REPO:${{ github.sha }}"
+          aws ssm put-parameter --name /medinet-pac/app/image_tag --type SecureString --overwrite --value "${{ github.sha }}" >/dev/null
+      - name: Desplegar nodo por nodo (el ALB mantiene el servicio arriba)
+        run: |
+          set -euo pipefail
+          IDS=$(aws ec2 describe-instances --filters Name=tag:Role,Values=pac-backend Name=instance-state-name,Values=running \
+                --query 'Reservations[].Instances[].InstanceId' --output text)
+          for ID in $IDS; do
+            echo "== Desplegando en $ID"
+            CMD=$(aws ssm send-command --instance-ids "$ID" --document-name AWS-RunShellScript \
+                  --parameters 'commands=["/usr/local/bin/pac-deploy"]' --query Command.CommandId --output text)
+            aws ssm wait command-executed --command-id "$CMD" --instance-id "$ID" || true
+            STATUS=$(aws ssm get-command-invocation --command-id "$CMD" --instance-id "$ID" --query Status --output text)
+            aws ssm get-command-invocation --command-id "$CMD" --instance-id "$ID" --query StandardOutputContent --output text | tail -5
+            [ "$STATUS" = "Success" ] || { echo "Fallo en $ID: $STATUS"; exit 1; }
+            sleep 25   # el health check del ALB vuelve a marcarlo sano antes de tocar el siguiente
+          done

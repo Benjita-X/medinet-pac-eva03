@@ -1,0 +1,441 @@
+{
+	"@programName": "ZAP",
+	"@version": "2.17.0",
+	"@generated": "Mon, 16 Nov 2026 04:32:01",
+	"created": "2026-11-16T04:32:01.348520011Z",
+	"insights":[
+		{
+			"level": "Low",
+			"reason": "Warning",
+			"site": "",
+			"key": "insight.log.warn",
+			"description": "ZAP warnings logged - see the zap.log file for details",
+			"statistic": "30"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://pacapi:8000",
+			"key": "insight.code.2xx",
+			"description": "Percentage of responses with status code 2xx",
+			"statistic": "16"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://pacapi:8000",
+			"key": "insight.code.4xx",
+			"description": "Percentage of responses with status code 4xx",
+			"statistic": "82"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://pacapi:8000",
+			"key": "insight.code.5xx",
+			"description": "Percentage of responses with status code 5xx",
+			"statistic": "1"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://pacapi:8000",
+			"key": "insight.endpoint.ctype.application/json",
+			"description": "Percentage of endpoints with content type application/json",
+			"statistic": "100"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://pacapi:8000",
+			"key": "insight.endpoint.method.GET",
+			"description": "Percentage of endpoints with method GET",
+			"statistic": "40"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://pacapi:8000",
+			"key": "insight.endpoint.method.PATCH",
+			"description": "Percentage of endpoints with method PATCH",
+			"statistic": "45"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://pacapi:8000",
+			"key": "insight.endpoint.method.POST",
+			"description": "Percentage of endpoints with method POST",
+			"statistic": "15"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://pacapi:8000",
+			"key": "insight.endpoint.total",
+			"description": "Count of total endpoints",
+			"statistic": "20"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://pacapi:8000",
+			"key": "insight.response.slow",
+			"description": "Percentage of slow responses",
+			"statistic": "3"
+		}
+	],
+	"site":[ 
+		{
+			"@name": "http://pacapi:8000",
+			"@host": "pacapi",
+			"@port": "8000",
+			"@ssl": "false",
+			"alerts": [ 
+				{
+					"pluginid": "100000",
+					"alertRef": "100000-2",
+					"alert": "A Server Error response code was returned by the server",
+					"name": "A Server Error response code was returned by the server",
+					"riskcode": "1",
+					"confidence": "3",
+					"riskdesc": "Low (High)",
+					"desc": "<p>A response code of 500 was returned by the server.</p><p>This may indicate that the application is failing to handle unexpected input correctly.</p><p>Raised by the 'Alert on HTTP Response Code Error' script</p>",
+					"instances":[ 
+						{
+							"id": "7",
+							"uri": "http://pacapi:8000/patients/1180935187466295391",
+							"nodeName": "http:\/\/pacapi:8000\/patients\/1180935187466295391",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "500",
+							"otherinfo": ""
+						}
+					],
+					"count": "1",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "388",
+					"wascid": "20",
+					"sourceid": "11"
+				},
+				{
+					"pluginid": "90004",
+					"alertRef": "90004-1",
+					"alert": "Cross-Origin-Resource-Policy Header Missing or Invalid",
+					"name": "Cross-Origin-Resource-Policy Header Missing or Invalid",
+					"riskcode": "1",
+					"confidence": "2",
+					"riskdesc": "Low (Medium)",
+					"desc": "<p>Cross-Origin-Resource-Policy header is an opt-in header designed to counter side-channels attacks like Spectre. Resource should be specifically set as shareable amongst different origins.</p>",
+					"instances":[ 
+						{
+							"id": "3",
+							"uri": "http://pacapi:8000/openapi.json",
+							"nodeName": "http:\/\/pacapi:8000\/openapi.json",
+							"method": "GET",
+							"param": "Cross-Origin-Resource-Policy",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "31",
+							"uri": "http://pacapi:8000/patients/validate-run",
+							"nodeName": "http:\/\/pacapi:8000\/patients\/validate-run ()({run})",
+							"method": "POST",
+							"param": "Cross-Origin-Resource-Policy",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": ""
+						}
+					],
+					"count": "2",
+					"systemic": false,
+					"solution": "<p>Ensure that the application/web server sets the Cross-Origin-Resource-Policy header appropriately, and that it sets the Cross-Origin-Resource-Policy header to 'same-origin' for all web pages.</p><p>'same-site' is considered as less secured and should be avoided.</p><p>If resources must be shared, set the header to 'cross-origin'.</p><p>If possible, ensure that the end user uses a standards-compliant and modern web browser that supports the Cross-Origin-Resource-Policy header (https://caniuse.com/mdn-http_headers_cross-origin-resource-policy).</p>",
+					"otherinfo": "",
+					"reference": "<p>https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Embedder-Policy</p>",
+					"cweid": "693",
+					"wascid": "14",
+					"sourceid": "1"
+				},
+				{
+					"pluginid": "100000",
+					"alertRef": "100000-1",
+					"alert": "A Client Error response code was returned by the server",
+					"name": "A Client Error response code was returned by the server",
+					"riskcode": "0",
+					"confidence": "3",
+					"riskdesc": "Informational (High)",
+					"desc": "<p>A response code of 404 was returned by the server.</p><p>This may indicate that the application is failing to handle unexpected input correctly.</p><p>Raised by the 'Alert on HTTP Response Code Error' script</p>",
+					"instances":[ 
+						{
+							"id": "8",
+							"uri": "http://pacapi:8000",
+							"nodeName": "http:\/\/pacapi:8000",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "649",
+							"uri": "http://pacapi:8000/",
+							"nodeName": "http:\/\/pacapi:8000\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "6",
+							"uri": "http://pacapi:8000/4772574954291058926",
+							"nodeName": "http:\/\/pacapi:8000\/4772574954291058926",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "0",
+							"uri": "http://pacapi:8000/patients?run=&apellido_paterno=&apellido_materno=&prevision=&page=1&page_size=20",
+							"nodeName": "http:\/\/pacapi:8000\/patients (apellido_materno,apellido_paterno,page,page_size,prevision,run)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "4",
+							"uri": "http://pacapi:8000/patients/10",
+							"nodeName": "http:\/\/pacapi:8000\/patients\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "655",
+							"uri": "http://pacapi:8000/patients/10/",
+							"nodeName": "http:\/\/pacapi:8000\/patients\/10\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "733",
+							"uri": "http://pacapi:8000/patients/actuator/health",
+							"nodeName": "http:\/\/pacapi:8000\/patients\/actuator\/health",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "479",
+							"uri": "http://pacapi:8000/computeMetadata/v1/",
+							"nodeName": "http:\/\/pacapi:8000\/computeMetadata\/v1\/ ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "476",
+							"uri": "http://pacapi:8000/latest/meta-data/",
+							"nodeName": "http:\/\/pacapi:8000\/latest\/meta-data\/ ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "492",
+							"uri": "http://pacapi:8000/metadata/instance",
+							"nodeName": "http:\/\/pacapi:8000\/metadata\/instance ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "494",
+							"uri": "http://pacapi:8000/metadata/v1",
+							"nodeName": "http:\/\/pacapi:8000\/metadata\/v1 ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "481",
+							"uri": "http://pacapi:8000/opc/v1/instance/",
+							"nodeName": "http:\/\/pacapi:8000\/opc\/v1\/instance\/ ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "485",
+							"uri": "http://pacapi:8000/opc/v2/instance/",
+							"nodeName": "http:\/\/pacapi:8000\/opc\/v2\/instance\/ ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "496",
+							"uri": "http://pacapi:8000/openstack/latest/meta_data.json",
+							"nodeName": "http:\/\/pacapi:8000\/openstack\/latest\/meta_data.json ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5",
+							"uri": "http://pacapi:8000/patients/10",
+							"nodeName": "http:\/\/pacapi:8000\/patients\/10 ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "653",
+							"uri": "http://pacapi:8000/patients/10/",
+							"nodeName": "http:\/\/pacapi:8000\/patients\/10\/ ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "1",
+							"uri": "http://pacapi:8000/patients",
+							"nodeName": "http:\/\/pacapi:8000\/patients ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "652",
+							"uri": "http://pacapi:8000/patients/",
+							"nodeName": "http:\/\/pacapi:8000\/patients\/ ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						}
+					],
+					"count": "18",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "388",
+					"wascid": "20",
+					"sourceid": "13"
+				},
+				{
+					"pluginid": "10049",
+					"alertRef": "10049-1",
+					"alert": "Non-Storable Content",
+					"name": "Non-Storable Content",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.</p>",
+					"instances":[ 
+						{
+							"id": "2",
+							"uri": "http://pacapi:8000/openapi.json",
+							"nodeName": "http:\/\/pacapi:8000\/openapi.json",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "authorization:",
+							"otherinfo": ""
+						},
+						{
+							"id": "29",
+							"uri": "http://pacapi:8000/patients?run=&apellido_paterno=&apellido_materno=&prevision=&page=1&page_size=20",
+							"nodeName": "http:\/\/pacapi:8000\/patients (apellido_materno,apellido_paterno,page,page_size,prevision,run)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "no-store",
+							"otherinfo": ""
+						},
+						{
+							"id": "26",
+							"uri": "http://pacapi:8000/patients/10",
+							"nodeName": "http:\/\/pacapi:8000\/patients\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "no-store",
+							"otherinfo": ""
+						},
+						{
+							"id": "28",
+							"uri": "http://pacapi:8000/patients/10",
+							"nodeName": "http:\/\/pacapi:8000\/patients\/10 ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "PATCH ",
+							"otherinfo": ""
+						},
+						{
+							"id": "27",
+							"uri": "http://pacapi:8000/patients",
+							"nodeName": "http:\/\/pacapi:8000\/patients ()({\"run\":\"John Doe\",\"nombres\":\"John Doe\",\"apellido_paterno\":\"John Doe\",\"apellido_materno\":\"John Doe\",\"fecha_nacimiento\":\"1970-01-01\",\"prevision\":\"FONASA\",\"email\":zaproxy@example.com,\"telefono\":\"John Doe\",\"direccion\":\"John Doe\"})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "no-store",
+							"otherinfo": ""
+						}
+					],
+					"count": "5",
+					"systemic": true,
+					"solution": "<p>The content may be marked as storable by ensuring that the following conditions are satisfied:</p><p>The request method must be understood by the cache and defined as being cacheable (\"GET\", \"HEAD\", and \"POST\" are currently defined as cacheable)</p><p>The response status code must be understood by the cache (one of the 1XX, 2XX, 3XX, 4XX, or 5XX response classes are generally understood)</p><p>The \"no-store\" cache directive must not appear in the request or response header fields</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"private\" response directive must not appear in the response</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"Authorization\" header field must not appear in the request, unless the response explicitly allows it (using one of the \"must-revalidate\", \"public\", or \"s-maxage\" Cache-Control response directives)</p><p>In addition to the conditions above, at least one of the following conditions must also be satisfied by the response:</p><p>It must contain an \"Expires\" header field</p><p>It must contain a \"max-age\" response directive</p><p>For \"shared\" caches such as \"proxy\" caches, it must contain a \"s-maxage\" response directive</p><p>It must contain a \"Cache Control Extension\" that allows it to be cached</p><p>It must have a status code that is defined as cacheable by default (200, 203, 204, 206, 300, 301, 404, 405, 410, 414, 501).</p>",
+					"otherinfo": "",
+					"reference": "<p>https://datatracker.ietf.org/doc/html/rfc7234</p><p>https://datatracker.ietf.org/doc/html/rfc7231</p><p>https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html</p>",
+					"cweid": "524",
+					"wascid": "13",
+					"sourceid": "1"
+				}
+			]
+		}
+	],
+	"sequences":[
+	]
+
+}

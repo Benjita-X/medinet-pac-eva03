@@ -1,0 +1,82 @@
+#!/bin/bash
+# Arranque de un nodo backend PAC (Amazon Linux 2023).
+# Instala Docker y deja el script /usr/local/bin/pac-deploy, que el pipeline
+# vuelve a ejecutar por SSM en cada despliegue.
+set -euo pipefail
+dnf -y update --security
+dnf -y install docker jq
+systemctl enable --now docker
+
+cat > /usr/local/bin/pac-deploy <<'DEPLOY'
+#!/bin/bash
+set -euo pipefail
+REGION="${region}"
+TAG=$(aws ssm get-parameter --region "$REGION" --with-decryption --name "/${project}/app/image_tag" --query Parameter.Value --output text)
+if [ "$TAG" = "none" ]; then echo "Aun no hay imagen publicada en ECR"; exit 0; fi
+IMAGE="${ecr_repository}:$TAG"
+TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
+NODE=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/tags/instance/NodeId || echo node)
+
+# Secretos en memoria (tmpfs), legibles solo por el usuario del contenedor (10001).
+SECRETS=/run/pac-secrets
+mkdir -p "$SECRETS" && mountpoint -q "$SECRETS" || mount -t tmpfs -o size=1m,mode=0700 tmpfs "$SECRETS"
+umask 077
+DBSECRET=$(aws secretsmanager get-secret-value --region "$REGION" --secret-id "${db_secret_arn}" --query SecretString --output text)
+echo "$DBSECRET" | jq -r .password > "$SECRETS/admin_password"
+ADMIN_USER=$(echo "$DBSECRET" | jq -r .username)
+aws ssm get-parameter --region "$REGION" --with-decryption --name "/${project}/db/api_password" --query Parameter.Value --output text > "$SECRETS/api_password"
+aws ssm get-parameter --region "$REGION" --with-decryption --name "/${project}/jwt/secret" --query Parameter.Value --output text > "$SECRETS/jwt_secret"
+chown -R 10001:10001 "$SECRETS"; chmod 0400 "$SECRETS"/*
+
+# CA de Amazon RDS para verificar el certificado del servidor (verify-full).
+# Es un certificado público: 0644 para que el usuario del contenedor (10001) pueda leerlo pese al umask 077.
+mkdir -p /opt/pac && curl -sf -o /opt/pac/rds-ca.pem https://truststore.pki.rds.amazonaws.com/${region}/${region}-bundle.pem
+chmod 0644 /opt/pac/rds-ca.pem
+
+aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "${ecr_registry}"
+docker pull "$IMAGE"
+
+HARDEN=(--read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges:true --user 10001:10001
+        -v /opt/pac/rds-ca.pem:/certs/rds-ca.pem:ro
+        -e DB_HOST="${db_host}" -e DB_PORT=5432 -e POSTGRES_DB="${db_name}"
+        -e DB_SSLMODE=verify-full -e DB_SSLROOTCERT=/certs/rds-ca.pem -e PAC_DB_USER=pac_api)
+
+# 1) Migraciones + rol de mínimo privilegio (con lock: un solo nodo migra a la vez).
+docker run --rm "$${HARDEN[@]}" -e POSTGRES_USER="$ADMIN_USER" \
+  -v "$SECRETS/admin_password:/run/secrets/admin_password:ro" \
+  -v "$SECRETS/api_password:/run/secrets/api_password:ro" \
+  "$IMAGE" admin
+
+# 2) API: reemplaza el contenedor anterior.
+docker rm -f pac-api 2>/dev/null || true
+docker run -d --name pac-api --restart unless-stopped -p 8000:8000 "$${HARDEN[@]}" \
+  -e PAC_NODE_ID="$NODE" -e PAC_CORS_ORIGINS="${cors_origins}" -e PAC_TRUSTED_PROXIES="*" \
+  -v "$SECRETS/api_password:/run/secrets/api_password:ro" \
+  -v "$SECRETS/jwt_secret:/run/secrets/jwt_secret:ro" \
+  --log-driver awslogs --log-opt awslogs-region="$REGION" \
+  --log-opt awslogs-group="${log_group}" --log-opt awslogs-stream="$NODE" \
+  "$IMAGE" api
+
+for i in $(seq 1 30); do
+  if curl -sf http://127.0.0.1:8000/health >/dev/null; then echo "API OK en $NODE ($TAG)"; exit 0; fi
+  sleep 2
+done
+echo "La API no respondio"; docker logs --tail 50 pac-api || true; exit 1
+DEPLOY
+chmod 0750 /usr/local/bin/pac-deploy
+
+# Tras un reinicio, systemd vuelve a obtener secretos (tmpfs se borra) y levanta la API.
+cat > /etc/systemd/system/pac-deploy.service <<'UNIT'
+[Unit]
+Description=Despliegue del backend PAC
+After=docker.service network-online.target
+Wants=network-online.target
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/pac-deploy
+[Install]
+WantedBy=multi-user.target
+UNIT
+systemctl daemon-reload
+systemctl enable pac-deploy.service
+/usr/local/bin/pac-deploy || true
