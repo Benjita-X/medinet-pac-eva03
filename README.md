@@ -2,7 +2,7 @@
 
 Grupo 6 · Desarrollo Seguro (CI3064) · INACAP Temuco
 
-Frontend y API de pacientes desplegados en AWS en alta disponibilidad (2 zonas), creada con Terraform.
+Frontend y API de pacientes desplegados en AWS en alta disponibilidad (2 zonas), creados con Terraform.
 
 ## Carpetas
 
