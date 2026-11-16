@@ -27,7 +27,7 @@ def request(method, url, token=None, body=None):
         headers["Authorization"] = f"Bearer {token}"
     req = urllib.request.Request(url, data=data, method=method, headers=headers)
     try:
-        with urllib.request.urlopen(req, timeout=15) as r:
+        with urllib.request.urlopen(req, timeout=30) as r:
             return r.status, r.read().decode(), r.headers.get("X-PAC-Node", "?")
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode(), e.headers.get("X-PAC-Node", "?")

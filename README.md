@@ -33,7 +33,7 @@ flowchart LR
 | Sin credenciales en el repositorio | Contraseña maestra RDS gestionada por AWS (Secrets Manager); API y JWT en SSM SecureString con KMS; `.gitignore` |
 | AWS Academy (LabRole / LabInstanceProfile) | variable `aws_academy = true` |
 | Escaneo IaC en CI/CD | job `iac-scan` (Checkov + `terraform validate`) en `.github/workflows/ci-cd.yml` |
-| ALB en 2 AZ con health checks | `infra/alb_dns.tf` (`/health` cada 10 s) |
+| ALB en 2 AZ con health checks | `infra/alb_dns.tf` (`/health` cada 5 s) + apagado ordenado `pac-drain` en `infra/user_data.sh.tftpl` |
 | FQDN + certificado válido, 80 → 443 | ACM + Route 53 en `infra/alb_dns.tf`; política `ELBSecurityPolicy-TLS13-1-2-2021-06` |
 | Swagger solo bajo HTTPS | `https://<FQDN>/docs` |
 | 2 EC2 en AZ distintas, contenedor endurecido | `infra/compute.tf`, `Dockerfile`, `infra/user_data.sh.tftpl` |
@@ -171,7 +171,9 @@ terraform destroy
 Revisa después en la consola que no queden instancias, NAT Gateway, ALB ni RDS. La llave KMS queda programada para borrarse en 7 días, y eso no tiene costo extra.
 
 ### Despliegue realizado (16-11-2026)
-Se desplegó en `us-east-2` sobre `https://medinetpacg6.dpdns.org`, se tomaron todas las evidencias (`docs/evidencias/aws/`) y luego se ejecutó `terraform destroy` (70 recursos eliminados). Resultados: certificado ACM válido con TLS 1.3, ZAP 120/0/0, ataque 13/13 bloqueado (carrera repartida 25/25 entre nodos y 1 fila en RDS) y failover con 96,98 % de disponibilidad.
+Se desplegó en `us-east-2` sobre `https://medinetpacg6.dpdns.org`, se tomaron todas las evidencias (`docs/evidencias/aws/`) y luego se ejecutó `terraform destroy` (70 recursos eliminados). Resultados: certificado ACM válido con TLS 1.3, ZAP 120/0/0, ataque 13/13 bloqueado (carrera repartida 25/25 entre nodos y 1 fila en RDS) y failover con 96,98 % de disponibilidad (unos 5 s de errores 502).
+
+Se volvió a desplegar el mismo día con el apagado ordenado (`pac-drain`: el nodo sale del target group antes de detenerse) y el health check cada 5 s: el failover dio **100 % (81/81, sin errores)**. Las fotos de las pruebas son capturas reales de PowerShell y de la consola de AWS (`docs/evidencias/capturas/` y `docs/evidencias/capturas_aws/`), tomadas con `tools/capturas_locales.ps1` y `tools/capturas_aws.ps1`.
 
 ## Decisiones y omisiones justificadas
 - **WAF, Enhanced Monitoring, RDS standby Multi-AZ y DNSSEC** quedan fuera por costo o por restricciones de AWS Academy. Cada uno está justificado en `.checkov.yaml` o en comentarios `checkov:skip` dentro del código. `db_multi_az = true` activa la réplica standby de RDS.

@@ -34,12 +34,14 @@ def main():
     p.add_argument("base_url")
     p.add_argument("--token", default="")
     p.add_argument("--interval", type=float, default=0.5)
+    p.add_argument("--duration", type=float, default=0, help="segundos de prueba (0 = hasta Ctrl+C)")
     a = p.parse_args()
+    end = time.monotonic() + a.duration if a.duration else None
     url = a.base_url.rstrip("/") + ("/patients?page_size=1" if a.token else "/health")
     stats, nodes, total = Counter(), Counter(), 0
     print(f"Consultando {url} cada {a.interval}s. Detén una EC2 ahora. Ctrl+C para terminar.\n")
     try:
-        while True:
+        while end is None or time.monotonic() < end:
             status, node, elapsed = call(url, a.token)
             total += 1
             stats[status] += 1
