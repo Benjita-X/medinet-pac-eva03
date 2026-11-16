@@ -17,6 +17,7 @@ locals {
     log_group      = aws_cloudwatch_log_group.app.name
     cors_origins   = var.cors_origins
     target_group   = aws_lb_target_group.pac.arn
+    target_front   = aws_lb_target_group.front.arn
   })
 }
 
@@ -66,4 +67,11 @@ resource "aws_lb_target_group_attachment" "pac" {
   target_group_arn = aws_lb_target_group.pac.arn
   target_id        = aws_instance.pac[count.index].id
   port             = 8000
+}
+
+resource "aws_lb_target_group_attachment" "front" {
+  count            = 2
+  target_group_arn = aws_lb_target_group.front.arn
+  target_id        = aws_instance.pac[count.index].id
+  port             = 8080
 }

@@ -156,6 +156,23 @@ resource "aws_lb_target_group" "pac" {
   }
 }
 
+# Frontend (nginx sin privilegios, puerto 8080) en los mismos 2 nodos.
+resource "aws_lb_target_group" "front" {
+  name                 = "${local.name}-front"
+  port                 = 8080
+  protocol             = "HTTP"
+  vpc_id               = aws_vpc.main.id
+  deregistration_delay = 15
+  health_check {
+    path                = "/healthz"
+    matcher             = "200"
+    interval            = 5
+    timeout             = 4
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+}
+
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.pac.arn
   port              = 80
@@ -176,8 +193,23 @@ resource "aws_lb_listener" "https" {
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06" # solo TLS 1.2 y 1.3
   certificate_arn   = aws_acm_certificate_validation.pac.certificate_arn
+  # Por defecto, el frontend; las rutas de la API van al backend (regla de abajo).
   default_action {
     type             = "forward"
+    target_group_arn = aws_lb_target_group.front.arn
+  }
+}
+
+resource "aws_lb_listener_rule" "api" {
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 10
+  action {
+    type             = "forward"
     target_group_arn = aws_lb_target_group.pac.arn
+  }
+  condition {
+    path_pattern {
+      values = ["/patients*", "/docs*", "/openapi.json", "/health"]
+    }
   }
 }

@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "ec2_app" {
   statement {
     sid       = "DrenarseDelBalanceador" # al apagarse, el nodo sale del ALB antes de cortar conexiones
     actions   = ["elasticloadbalancing:DeregisterTargets", "elasticloadbalancing:RegisterTargets"]
-    resources = [aws_lb_target_group.pac.arn]
+    resources = [aws_lb_target_group.pac.arn, aws_lb_target_group.front.arn]
   }
   statement {
     sid       = "EnviarLogs"
