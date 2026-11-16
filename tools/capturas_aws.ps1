@@ -54,6 +54,12 @@ $Host.UI.RawUI.WindowTitle = "MediNet-Core PAC - pruebas en AWS"
 Paso 'a1_http_a_https' 'HTTP 80 redirige a HTTPS 443 (ALB)' @("curl.exe -sI http://$Fqdn/health")
 Paso 'a2_https_cabeceras' 'HTTPS con TLS valido y cabeceras de seguridad' @("curl.exe -si https://$Fqdn/health")
 Paso 'a3_401' 'Sin token: 401' @("curl.exe -si https://$Fqdn/patients")
+Paso 'i_frontend' 'Frontend por HTTPS y ruteo del ALB: / al frontend, /health y /patients a la API' @(
+  "curl.exe -sI https://$Fqdn/",
+  "curl.exe -s -o NUL -w `"/        -> HTTP %{http_code}  %{content_type}`n`" https://$Fqdn/",
+  "curl.exe -s -w `"  <- /health (API)`n`" https://$Fqdn/health",
+  "curl.exe -s -o NUL -w `"/patients -> HTTP %{http_code} (API, sin token)`n`" https://$Fqdn/patients"
+)
 
 Paso 'g_certificado' 'Certificado TLS del FQDN (validacion estricta de Windows)' @(
   "python -c `"import ssl,socket;h='$Fqdn';c=ssl.create_default_context();s=c.wrap_socket(socket.create_connection((h,443)),server_hostname=h);x=s.getpeercert();print('Sujeto :',dict(i[0] for i in x['subject'])['commonName']);print('Emisor :',dict(i[0] for i in x['issuer'])['organizationName'],'-',dict(i[0] for i in x['issuer'])['commonName']);print('Valido :',x['notBefore'],'->',x['notAfter']);print('TLS    :',s.version(),s.cipher()[0])`"",
