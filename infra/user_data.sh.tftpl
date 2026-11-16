@@ -58,7 +58,14 @@ docker run -d --name pac-api --restart unless-stopped -p 8000:8000 "$${HARDEN[@]
   "$IMAGE" api
 
 for i in $(seq 1 30); do
-  if curl -sf http://127.0.0.1:8000/health >/dev/null; then echo "API OK en $NODE ($TAG)"; exit 0; fi
+  if curl -sf http://127.0.0.1:8000/health >/dev/null; then
+    echo "API OK en $NODE ($TAG)"
+    # Si el nodo se habia drenado al apagarse, vuelve a entrar al balanceador.
+    TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
+    IID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+    aws elbv2 register-targets --region "$REGION" --target-group-arn "${target_group}" --targets Id="$IID",Port=8000 || true
+    exit 0
+  fi
   sleep 2
 done
 echo "La API no respondio"; docker logs --tail 50 pac-api || true; exit 1
@@ -77,6 +84,31 @@ ExecStart=/usr/local/bin/pac-deploy
 [Install]
 WantedBy=multi-user.target
 UNIT
+# Apagado ordenado: antes de detener Docker, el nodo se saca del ALB y espera a que
+# terminen las solicitudes en curso. Asi el failover no corta peticiones.
+cat > /usr/local/bin/pac-drain <<'DRAIN'
+#!/bin/bash
+TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
+IID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+aws elbv2 deregister-targets --region "${region}" --target-group-arn "${target_group}" --targets Id="$IID",Port=8000
+sleep 20   # deregistration_delay (15 s) + margen: las conexiones abiertas terminan
+DRAIN
+chmod 0750 /usr/local/bin/pac-drain
+cat > /etc/systemd/system/pac-drain.service <<'UNIT'
+[Unit]
+Description=Saca el nodo PAC del balanceador antes de apagarlo
+After=network-online.target docker.service
+Wants=network-online.target
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/true
+ExecStop=/usr/local/bin/pac-drain
+TimeoutStopSec=60
+[Install]
+WantedBy=multi-user.target
+UNIT
 systemctl daemon-reload
+systemctl enable --now pac-drain.service
 systemctl enable pac-deploy.service
 /usr/local/bin/pac-deploy || true

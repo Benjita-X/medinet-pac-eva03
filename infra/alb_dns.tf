@@ -149,10 +149,10 @@ resource "aws_lb_target_group" "pac" {
   health_check {
     path                = "/health"
     matcher             = "200"
-    interval            = 10
-    timeout             = 5
+    interval            = 5
+    timeout             = 4
     healthy_threshold   = 2
-    unhealthy_threshold = 2 # ~20 s para sacar un nodo caído (failover)
+    unhealthy_threshold = 2 # ~10 s para sacar un nodo que cae sin aviso; un apagado normal se drena antes (pac-drain)
   }
 }
 

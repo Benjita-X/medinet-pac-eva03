@@ -16,6 +16,7 @@ locals {
     db_secret_arn  = aws_db_instance.pac.master_user_secret[0].secret_arn
     log_group      = aws_cloudwatch_log_group.app.name
     cors_origins   = var.cors_origins
+    target_group   = aws_lb_target_group.pac.arn
   })
 }
 
